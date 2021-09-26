@@ -270,3 +270,7 @@ D:\new\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache
 D:\new\obj\Debug\Assembly-CSharp.csproj.CopyComplete
 D:\new\obj\Debug\Assembly-CSharp.dll
 D:\new\obj\Debug\Assembly-CSharp.pdb
+D:\JiangHuBaYe\new\obj\Debug\Assembly-CSharp.csprojAssemblyReference.cache
+D:\JiangHuBaYe\new\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache
+D:\JiangHuBaYe\new\obj\Debug\Assembly-CSharp.dll
+D:\JiangHuBaYe\new\obj\Debug\Assembly-CSharp.pdb
