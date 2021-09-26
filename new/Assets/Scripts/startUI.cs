@@ -71,7 +71,7 @@ public class startUI : MonoBehaviour
 
     void btn_exit()
     {
-
+        Application.Quit();
     }
 
     void gameinit()
@@ -96,8 +96,9 @@ public class startUI : MonoBehaviour
             transform.GetChild(2).GetChild(1).GetChild(1).GetComponent<Button>().onClick.AddListener(btn_closerecord);
 
         }
-        else { 
-        //transform.GetChild(2).GetChild(0).GetChild(0).GetChild(0).GetComponent<scrol>
+        else
+        {
+            //transform.GetChild(2).GetChild(0).GetChild(0).GetChild(0).GetComponent<scrol>
         }
 
     }

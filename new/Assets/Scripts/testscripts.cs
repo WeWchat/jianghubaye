@@ -23,12 +23,12 @@ public class testscripts : MonoBehaviour
         List<characterClass> motherlist = new List<characterClass>();
 
         List<sonClass> sonlist = new List<sonClass>();
-
+        List<sonClass> daughterlist = new List<sonClass>();
 
         int num = Random.Range(5, 10);
 
 
-
+        //先随机生成grandfather
         for (int i = 0; i < num; i++)//生成grandfather
         {
             parentClass grandfather = new parentClass();
@@ -50,10 +50,10 @@ public class testscripts : MonoBehaviour
                 grandfather.childcount = Random.Range(1, 5);
             }
 
-
             grandfatherlist.Add(grandfather);
         }
 
+        //根据grandfather是否结婚来生成grandmother
         for (int i = 0; i < grandfatherlist.Count; i++)//生成grandmother
         {
             if (grandfatherlist[i].marry == 0)
@@ -83,19 +83,15 @@ public class testscripts : MonoBehaviour
 
         }
 
-
-
-
-
+        //根据grandfather来生成下一辈（判断有没有结婚，孩子的母亲的姓名）
         for (int i = 0; i < grandfatherlist.Count; i++)
         {
             if (grandfatherlist[i].child == 0)
             {
-                characterClass characterClass = new characterClass();
-                characterClass.sex = Random.Range(0, 2);
-                if (characterClass.sex == 0)//father
+                for (int t = 0; t < grandfatherlist[i].childcount; t++)
                 {
-                    characterClass.name = strfun(allData.allmalename);
+                    characterClass characterClass = new characterClass();
+                    characterClass.sex = Random.Range(0, 2);
                     characterClass.age = grandfatherlist[i].age - Random.Range(18, 30);
                     characterClass.marry = Random.Range(0, 2);
                     characterClass.child = Random.Range(0, 2);
@@ -112,48 +108,109 @@ public class testscripts : MonoBehaviour
                         characterClass.fathername = grandfatherlist[i].last_name + grandfatherlist[i].name;
                     }
 
+                    if (characterClass.sex == 0)//father
+                    {
+                        characterClass.name = strfun(allData.allmalename);
+                        fatherlist.Add(characterClass);
+                    }
 
-                    fatherlist.Add(characterClass);
+                    if (characterClass.sex == 1)//mother
+                    {
+                        characterClass.name = strfun(allData.allfemalename);
+                        motherlist.Add(characterClass);
+                    }
+                    print(string.Format("姓名是{0}，年纪是{1}，结婚{2}，孩子{3}，父母数量{4},爸爸是{5}，妈妈是{6},孩子数量{7}",
+                        grandfatherlist[i].last_name + characterClass.name, characterClass.age, characterClass.marry, characterClass.child,
+                        characterClass.parentcount, characterClass.fathername, characterClass.mothername, characterClass.childcount,characterClass.childname));
 
-                    //print(string.Format("姓名是{0}，年纪是{1}，结婚{2}，孩子{3}，父母数量{4},爸爸是{5}，妈妈是{6}",
-                    //    grandfatherlist[i].last_name + characterClass.name, characterClass.age, characterClass.marry, characterClass.child, characterClass.parentcount, characterClass.fathername, characterClass.mothername));
-
-
-
-
-                    //   print(characterClass.name + characterClass.age + characterClass.marry + characterClass.child + characterClass.parent + characterClass.parentcount + characterClass.parentname);
-                }
-                if (characterClass.sex == 1)//mother
-                {
-                    characterClass.name = strfun(allData.allfemalename);
-                    characterClass.age = grandfatherlist[i].age - Random.Range(18, 30);
-                    characterClass.marry = Random.Range(0, 2);
-                    characterClass.child = Random.Range(0, 2);
-                    characterClass.parent = 0;
-                }
-                if (grandfatherlist[i].husband != "")
-                {
-                    characterClass.parentcount = 2;
-                    characterClass.fathername = grandfatherlist[i].last_name + grandfatherlist[i].name;
-                    characterClass.mothername = grandfatherlist[i].husband;
-                }
-                else
-                {
-                    characterClass.parentcount = 1;
-                    characterClass.fathername = grandfatherlist[i].last_name + grandfatherlist[i].name;
+                 
                 }
 
             }
+
+
         }
 
+        //根据grandmother来生成下一辈（没有结婚但是有孩子的）
         for (int i = 0; i < grandmotherlist.Count; i++)
         {
             if (grandmotherlist[i].marry == 1 && grandmotherlist[i].child == 0)
             {
+                for (int t = 0; t < grandmotherlist[i].childcount; t++)
+                {
+                    characterClass characterClass = new characterClass();
+                    characterClass.sex = Random.Range(0, 2);
+                    characterClass.age = grandfatherlist[i].age - Random.Range(18, 30);
+                    characterClass.marry = Random.Range(0, 2);
+                    characterClass.child = Random.Range(0, 2);
+                    characterClass.parent = 0;
+                    characterClass.parentcount = 1;
+                    characterClass.mothername = grandmotherlist[i].last_name + grandmotherlist[i].name;
+
+                    if (characterClass.sex == 0)//father
+                    {
+                        characterClass.name = strfun(allData.allmalename);
+                        fatherlist.Add(characterClass);
+                    }
+                    if (characterClass.sex == 1)//mother
+                    {
+                        characterClass.name = strfun(allData.allfemalename);
+                        motherlist.Add(characterClass);
+                    }
+                }
 
             }
         }
 
+        //根据father来生成下一辈（包括结婚和未婚）
+        for (int i = 0; i < fatherlist.Count; i++)
+        {
+            if (fatherlist[i].child == 0)
+            {
+                for (int t = 0; t < fatherlist[i].childcount; t++)
+                {
+                    sonClass son = new sonClass();
+                    son.sex = Random.Range(0, 2);
+                    son.age = fatherlist[i].age - Random.Range(18, 30);
+                    son.marry = -1;
+                    son.child = -1;
+                    son.parent = 0;
+                    if (fatherlist[i].husband != "")
+                    {
+                        son.parentcount = 2;
+                        son.fathername = fatherlist[i].last_name + fatherlist[i].name;
+                        son.mothername = fatherlist[i].husband;
+                      
+                    }
+                    else
+                    {
+                        son.parentcount = 1;
+                        son.fathername = fatherlist[i].last_name + fatherlist[i].name;
+                        son.mothername = "";
+                    }
+                    if (son.sex == 0)
+                    {
+                        son.name = strfun(allData.allmalename);
+
+                        sonlist.Add(son);
+                    }
+                    if (son.sex == 1)
+                    {
+                        son.name = strfun(allData.allfemalename);
+                        sonlist.Add(son);
+                    }
+                }
+            }
+        }
+
+
+        // print(string.Format("名字是{0}，年龄是{1}，是否婚配{2}，是否有孩子{3}，孩子数量{4}",grandfatherlist[]))
+
+        //print(string.Format("姓名是{0}，年纪是{1}，结婚{2}，孩子{3}，父母数量{4},爸爸是{5}，妈妈是{6}",
+        //    grandfatherlist[i].last_name + characterClass.name, characterClass.age, characterClass.marry, characterClass.child,
+        //    characterClass.parentcount, characterClass.fathername, characterClass.mothername));
+
+        //   print(characterClass.name + characterClass.age + characterClass.marry + characterClass.child + characterClass.parent + characterClass.parentcount + characterClass.parentname);
         //for (int i = 0; i < 100; i++)
         //{
         //    print(Random.Range(0, 2));

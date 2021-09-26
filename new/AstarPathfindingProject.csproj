@@ -180,10 +180,17 @@
     <None Include="Assets\AstarPathfindingProject\Plugins\dependencies.txt" />
     <None Include="Assets\AstarPathfindingProject\AstarPathfindingProject.asmdef" />
     <Reference Include="UnityEditor.UI">
+<<<<<<< HEAD
       <HintPath>D:/JiangHuBaYe/new/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>D:/JiangHuBaYe/new/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+=======
+      <HintPath>C:/Users/Administrator/Desktop/new/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>C:/Users/Administrator/Desktop/new/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+>>>>>>> yjl
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.3.0f6/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -377,7 +384,11 @@
     <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
       <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/15.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
+    <Reference Include="LitJson">
+      <HintPath>C:/Users/Administrator/Desktop/new/Assets/LitJson.dll</HintPath>
+    </Reference>
     <Reference Include="Pathfinding.Ionic.Zip.Reduced">
+<<<<<<< HEAD
       <HintPath>D:/JiangHuBaYe/new/Assets/AstarPathfindingProject/Plugins/DotNetZip/Pathfinding.Ionic.Zip.Reduced.dll</HintPath>
     </Reference>
     <Reference Include="DOTween">
@@ -385,6 +396,15 @@
     </Reference>
     <Reference Include="DOTweenEditor">
       <HintPath>D:/JiangHuBaYe/new/Assets/DOTween/Editor/DOTweenEditor.dll</HintPath>
+=======
+      <HintPath>C:/Users/Administrator/Desktop/new/Assets/AstarPathfindingProject/Plugins/DotNetZip/Pathfinding.Ionic.Zip.Reduced.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween">
+      <HintPath>C:/Users/Administrator/Desktop/new/Assets/DOTween/DOTween.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTweenEditor">
+      <HintPath>C:/Users/Administrator/Desktop/new/Assets/DOTween/Editor/DOTweenEditor.dll</HintPath>
+>>>>>>> yjl
     </Reference>
     <Reference Include="netstandard">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.3.0f6/Editor/Data/NetStandard/ref/2.0.0/netstandard.dll</HintPath>

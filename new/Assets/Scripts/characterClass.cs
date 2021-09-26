@@ -38,6 +38,25 @@ public class characterClass : parentClass
 
 public class sonClass : characterClass
 {
-    
+    public string grandfather;
+    public string grandmother;
 
+}
+
+
+public class PlayerInfo
+{
+    public string id;
+    public string tedian;
+    public string miaoshu;
+}
+
+public class Root
+{
+    public List<PlayerInfo> cheng;
+    public List<PlayerInfo> hong;
+    public List<PlayerInfo> hui;
+    public List<PlayerInfo> lan;
+    public List<PlayerInfo> lv;
+    public List<PlayerInfo> zi;
 }

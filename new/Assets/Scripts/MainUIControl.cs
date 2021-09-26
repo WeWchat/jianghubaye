@@ -4,6 +4,11 @@ using UnityEngine;
 using System.IO;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using LitJson;
+
+
+
+
 public class MainUIControl : MonoBehaviour
 {
     // Start is called before the first frame update
@@ -11,6 +16,12 @@ public class MainUIControl : MonoBehaviour
     bool is_kai = true;
     [SerializeField] GameObject startmenu, gamecanvas;
     // float[] f = new float[3];
+
+    #region 读取JSON
+    StreamReader streamReader;
+    JsonReader jsonreader;
+
+    #endregion 
 
     #region 基本属性
 
@@ -50,19 +61,24 @@ public class MainUIControl : MonoBehaviour
 
     #region 服装
 
-    string clothesPath = "D:/game属性/人物/服装";
-
     Text[] clothes = new Text[8];
     Button[] clothesLeftbtn = new Button[8];
     Button[] clothesrightbtn = new Button[8];
+
+    Sprite[] backhairSprite = new Sprite[5];
+    Sprite[] eyeSprite = new Sprite[5];
+    Sprite[] eyebrowSprite = new Sprite[5];
+    Sprite[] faceshapeSprite = new Sprite[5];
+    Sprite[] fronthairSprite = new Sprite[5];
+    Sprite[] mouseSprite = new Sprite[5];
+    Sprite[] noiseSprite = new Sprite[5];
+    Sprite[] suitSprite = new Sprite[2];
     #endregion
 
-    #region 出身   
-    string chushen;
-
-    string aihao;
-
+    #region 出身      
+    Sprite[] chushenSprite = new Sprite[6];
     Text[] chushentext = new Text[3];
+    Root root;
     #endregion
 
     #region 随机按钮
@@ -98,11 +114,18 @@ public class MainUIControl : MonoBehaviour
 
     void Start()
     {
+        #region 读取JSON
+        streamReader = new StreamReader(Application.dataPath + "/StreamingAssets/test.json");
+        print(Application.dataPath + "/StreamingAssets/test.json");
+        jsonreader = new JsonReader(streamReader);
+        root = JsonMapper.ToObject<Root>(jsonreader);
+        #endregion
+
         #region 基本属性
         #region 性别
         for (int i = 0; i < 2; i++)
         {
-            sexbtn[i] = transform.GetChild(0).GetChild(1).GetChild(10 + i).GetComponent<Button>();
+            sexbtn[i] = transform.GetChild(1).GetChild(1).GetChild(10 + i).GetComponent<Button>();
             sexbtn[i].onClick.AddListener(delegate { btn_sex(EventSystem.current.currentSelectedGameObject.name); });
         }
 
@@ -110,19 +133,19 @@ public class MainUIControl : MonoBehaviour
         #endregion
 
         #region 姓名
-        finalName = transform.GetChild(0).GetChild(0).GetChild(0).GetChild(1).GetComponent<InputField>();
+        finalName = transform.GetChild(1).GetChild(0).GetChild(0).GetChild(1).GetComponent<InputField>();
         #endregion
 
         #region 魅力
-        meili = transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetComponent<Text>();
+        meili = transform.GetChild(1).GetChild(0).GetChild(1).GetChild(0).GetComponent<Text>();
         #endregion
 
         #region 寿命
-        shouming = transform.GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetComponent<Text>();
+        shouming = transform.GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetComponent<Text>();
         #endregion
 
         #region 造诣
-        zaoyi = transform.GetChild(0).GetChild(0).GetChild(3).GetComponent<Text>();
+        zaoyi = transform.GetChild(1).GetChild(0).GetChild(3).GetComponent<Text>();
         #endregion
 
         #endregion
@@ -130,28 +153,37 @@ public class MainUIControl : MonoBehaviour
         #region 服装
         for (int i = 0; i < 8; i++)
         {
-            clothesLeftbtn[i] = transform.GetChild(0).GetChild(1).GetChild(i).GetChild(0).GetComponent<Button>();
+            clothesLeftbtn[i] = transform.GetChild(1).GetChild(1).GetChild(i).GetChild(0).GetComponent<Button>();
             clothesLeftbtn[i].onClick.AddListener(delegate { btn_clothesleft(EventSystem.current.currentSelectedGameObject); });
 
-            clothesrightbtn[i] = transform.GetChild(0).GetChild(1).GetChild(i).GetChild(1).GetComponent<Button>();
+            clothesrightbtn[i] = transform.GetChild(1).GetChild(1).GetChild(i).GetChild(1).GetComponent<Button>();
             clothesrightbtn[i].onClick.AddListener(delegate { btn_clothesRight(EventSystem.current.currentSelectedGameObject); });
 
-            clothes[i] = transform.GetChild(0).GetChild(1).GetChild(i).GetChild(2).GetComponent<Text>();
+            clothes[i] = transform.GetChild(1).GetChild(1).GetChild(i).GetChild(2).GetComponent<Text>();
+
         }
+
+        readSprite(backhairSprite, "backhair", 5);
+        readSprite(eyeSprite, "eye", 5);
+        readSprite(eyebrowSprite, "eyebrow", 5);
+        readSprite(faceshapeSprite, "faceshape", 5);
+        readSprite(fronthairSprite, "fronthair", 5);
+        readSprite(mouseSprite, "mouse", 5);
+        readSprite(noiseSprite, "noise", 5);
+        readSprite(suitSprite, "suit", 2);
+
         #endregion
 
         #region 出身
 
-        //for (int i = 0; i < alltedain.Length; i++)
-        //{
-        //    anothername += alltedain[i] + ",";
-        //}
-        //File.WriteAllText(tedianpath, anothername);
-
+        for (int i = 0; i < chushenSprite.Length; i++)
+        {
+            chushenSprite[i] = Resources.Load<Sprite>(string.Format("chushen/{0}", i));
+        }
 
         for (int i = 0; i < chushentext.Length; i++)
         {
-            chushentext[i] = transform.GetChild(0).GetChild(4 + i).GetChild(0).GetComponent<Text>();
+            chushentext[i] = transform.GetChild(1).GetChild(4 + i).GetChild(0).GetComponent<Text>();
         }
 
         #endregion
@@ -168,7 +200,7 @@ public class MainUIControl : MonoBehaviour
         renwushuxing = new GameObject[strs_usestaticfun(allData.allrenwushuxing).Length]; ;
         for (int i = 0; i < renwushuxing.Length; i++)
         {
-            renwushuxing[i] = Instantiate(Resources.Load("Prefabs/模板") as GameObject, transform.GetChild(1).GetChild(0).GetChild(1));
+            renwushuxing[i] = Instantiate(Resources.Load("Prefabs/模板") as GameObject, transform.GetChild(0).GetChild(0).GetChild(1));
             if (strs_usestaticfun(allData.allrenwushuxing)[i].Length == 5)
             {
                 renwushuxing[i].transform.GetChild(0).localPosition = new Vector3(350, 1, 0);
@@ -185,7 +217,7 @@ public class MainUIControl : MonoBehaviour
 
         for (int i = 0; i < zhuangtaishuxing.Length; i++)
         {
-            zhuangtaishuxing[i] = Instantiate(Resources.Load("Prefabs/模板") as GameObject, transform.GetChild(1).GetChild(1).GetChild(1));
+            zhuangtaishuxing[i] = Instantiate(Resources.Load("Prefabs/模板") as GameObject, transform.GetChild(0).GetChild(1).GetChild(1));
             if (strs_usestaticfun(allData.allzhuangtaishuxing)[i].Length == 5)
             {
                 zhuangtaishuxing[i].transform.GetChild(0).localPosition = new Vector3(350, 1, 0);
@@ -197,7 +229,7 @@ public class MainUIControl : MonoBehaviour
         justordark[0] = Resources.Load<Sprite>("Pictures/zheng");
         justordark[1] = Resources.Load<Sprite>("Pictures/xie");
 
-        justimage = transform.GetChild(0).GetChild(3).GetComponent<Image>();
+        justimage = transform.GetChild(1).GetChild(3).GetComponent<Image>();
         #endregion
 
         #region  修炼属性
@@ -207,7 +239,7 @@ public class MainUIControl : MonoBehaviour
 
         for (int i = 0; i < xiulianshuxing.Length; i++)
         {
-            xiulianshuxing[i] = Instantiate(Resources.Load("Prefabs/模板") as GameObject, transform.GetChild(1).GetChild(2).GetChild(1));
+            xiulianshuxing[i] = Instantiate(Resources.Load("Prefabs/模板") as GameObject, transform.GetChild(0).GetChild(2).GetChild(1));
             if (strs_usestaticfun(allData.allxiulianshuxing)[i].Length == 4)
             {
                 xiulianshuxing[i].transform.GetChild(0).localPosition = new Vector3(280, 1, 0);
@@ -223,7 +255,7 @@ public class MainUIControl : MonoBehaviour
 
         for (int i = 0; i < zhandoushuxing.Length; i++)
         {
-            zhandoushuxing[i] = Instantiate(Resources.Load("Prefabs/模板") as GameObject, transform.GetChild(1).GetChild(3).GetChild(1));
+            zhandoushuxing[i] = Instantiate(Resources.Load("Prefabs/模板") as GameObject, transform.GetChild(0).GetChild(3).GetChild(1));
             int c = strs_usestaticfun(allData.allzhandoushuxing)[i].Length;
             switch (c)
             {
@@ -258,6 +290,11 @@ public class MainUIControl : MonoBehaviour
 
         #endregion
         btn_suiji(0);
+
+        for (int i = 0; i < 3; i++)
+        {
+            chushentext[i].transform.parent.gameObject.AddComponent<pointOn>();
+        }
     }
 
     // Update is called once per frame
@@ -287,12 +324,52 @@ public class MainUIControl : MonoBehaviour
 
         sexbtn[currrentSex].GetComponent<Image>().enabled = is_kai;
     }
+    string clothesReturn(string name)
+    {
+        switch (name)
+        {
+            case "发饰":
+                {
+                    return allData.allfashi;
+                }
+            case "发型":
+                {
+                    return allData.allfaxing;
+                }
+            case "眉毛":
+                {
+                    return allData.allmeimao;
+                }
+            case "鼻子":
+                {
+                    return allData.allbizhi;
+                }
+            case "眼睛":
+                {
+                    return allData.allyanjing;
+                }
+            case "嘴巴":
+                {
+                    return allData.allzuiba;
 
+                }
+            case "脸型":
+                {
+                    return allData.alllianxing;
+                }
+            case "衣服":
+                {
+                    return allData.allyifu;
+                }
+        }
+        return default;
+    }
     void btn_clothesleft(GameObject clothestype)
     {
         int equal = -2;
-        string path = "D:/game属性/人物/服装/" + clothestype.transform.parent.name + ".txt";
-        string[] allcontents = File.ReadAllLines(path);
+        string clothes = clothestype.transform.parent.name;
+
+        string[] allcontents = allData.returnFun(clothesReturn(clothes));
         for (int i = 0; i < allcontents.Length; i++)
         {
             if (allcontents[i] == clothestype.transform.parent.GetChild(2).GetComponent<Text>().text)
@@ -303,16 +380,26 @@ public class MainUIControl : MonoBehaviour
         equal--;
         if (equal == -1)
         {
-            equal = 4;
+            if (clothes == "衣服")
+            {
+                equal = 1;
+            }
+            else
+            {
+                equal = 4;
+            }
+
         }
         clothestype.transform.parent.GetChild(2).GetComponent<Text>().text = allcontents[equal];
+        changsprite(clothes, equal);
     }
 
     void btn_clothesRight(GameObject clothestype)
     {
         int equal = -2;
-        string path = "D:/game属性/人物/服装/" + clothestype.transform.parent.name + ".txt";
-        string[] allcontents = File.ReadAllLines(path);
+        string clothes = clothestype.transform.parent.name;
+        string[] allcontents = allData.returnFun(clothesReturn(clothes));
+
         for (int i = 0; i < allcontents.Length; i++)
         {
             if (allcontents[i] == clothestype.transform.parent.GetChild(2).GetComponent<Text>().text)
@@ -321,13 +408,134 @@ public class MainUIControl : MonoBehaviour
             }
         }
         equal++;
-        if (equal == 5)
+        if (clothes == "衣服")
         {
-            equal = 0;
+            if (equal == 2)
+            {
+                equal = 0;
+            }
         }
+        else
+        {
+            if (equal == 5)
+            {
+                equal = 0;
+            }
+        }
+
         clothestype.transform.parent.GetChild(2).GetComponent<Text>().text = allcontents[equal];
+        changsprite(clothes, equal);
     }
 
+    void changsprite(string name, int index)
+    {
+        GameObject selected = new GameObject();
+        for (int i = 0; i < 8; i++)
+        {
+            if (transform.GetChild(1).GetChild(1).GetChild(8).GetChild(i).gameObject.name == name)
+            {
+                selected = transform.GetChild(1).GetChild(1).GetChild(8).GetChild(i).gameObject;
+            }
+        }
+        Sprite[] sps;
+        if (name == "衣服")
+        {
+            sps = new Sprite[2];
+        }
+        else
+        {
+            sps = new Sprite[5];
+        }
+
+        switch (name)
+        {
+            case "发饰":
+                {
+                    sps = backhairSprite;
+                    break;
+                }
+            case "衣服":
+                {
+                    sps = suitSprite;
+                    break;
+                }
+            case "脸型":
+                {
+                    sps = faceshapeSprite;
+                    break;
+                }
+            case "发型":
+                {
+                    sps = fronthairSprite;
+                    break;
+                }
+            case "眼睛":
+                {
+                    sps = eyeSprite;
+                    break;
+                }
+            case "眉毛":
+                {
+                    sps = eyebrowSprite;
+                    break;
+                }
+            case "鼻子":
+                {
+                    sps = noiseSprite;
+                    break;
+                }
+            case "嘴巴":
+                {
+                    sps = mouseSprite;
+                    break;
+                }
+
+        }
+
+        selected.GetComponent<Image>().sprite = sps[index];
+    }
+
+    List<PlayerInfo> jsonreturn(int jsonindex)
+    {
+        List<PlayerInfo> suijijson = new List<PlayerInfo>();
+        switch (jsonindex)
+        {
+            case 0:
+                {
+                    suijijson = root.cheng;
+                    break;
+                }
+            case 1:
+                {
+                    suijijson = root.hong;
+                    break;
+                }
+            case 2:
+                {
+                    suijijson = root.hui;
+                    break;
+                }
+            case 3:
+                {
+                    suijijson = root.lan;
+                    break;
+                }
+            case 4:
+                {
+                    suijijson = root.lv;
+                    break;
+                }
+            case 5:
+                {
+                    suijijson = root.zi;
+                    break;
+                }
+        }
+
+
+        return suijijson;
+
+    }
     void btn_suiji(int sexindex)
     {
         #region 姓名
@@ -357,24 +565,62 @@ public class MainUIControl : MonoBehaviour
 
         #region 服装
 
-        transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetComponent<Text>().text = str_usestaticfun(allData.allfashi);
-        transform.GetChild(0).GetChild(1).GetChild(1).GetChild(2).GetComponent<Text>().text = str_usestaticfun(allData.allfaxing);
-        transform.GetChild(0).GetChild(1).GetChild(2).GetChild(2).GetComponent<Text>().text = str_usestaticfun(allData.allmeimao);
-        transform.GetChild(0).GetChild(1).GetChild(3).GetChild(2).GetComponent<Text>().text = str_usestaticfun(allData.allbizhi);
-        transform.GetChild(0).GetChild(1).GetChild(4).GetChild(2).GetComponent<Text>().text = str_usestaticfun(allData.allyanjing);
-        transform.GetChild(0).GetChild(1).GetChild(5).GetChild(2).GetComponent<Text>().text = str_usestaticfun(allData.allzuiba);
-        transform.GetChild(0).GetChild(1).GetChild(6).GetChild(2).GetComponent<Text>().text = str_usestaticfun(allData.alllianxing);
-        transform.GetChild(0).GetChild(1).GetChild(7).GetChild(2).GetComponent<Text>().text = str_usestaticfun(allData.allyifu);
+        transform.GetChild(1).GetChild(1).GetChild(0).GetChild(2).GetComponent<Text>().text = str_usestaticfun(allData.allfashi);
+        transform.GetChild(1).GetChild(1).GetChild(1).GetChild(2).GetComponent<Text>().text = str_usestaticfun(allData.allfaxing);
+        transform.GetChild(1).GetChild(1).GetChild(2).GetChild(2).GetComponent<Text>().text = str_usestaticfun(allData.allmeimao);
+        transform.GetChild(1).GetChild(1).GetChild(3).GetChild(2).GetComponent<Text>().text = str_usestaticfun(allData.allbizhi);
+        transform.GetChild(1).GetChild(1).GetChild(4).GetChild(2).GetComponent<Text>().text = str_usestaticfun(allData.allyanjing);
+        transform.GetChild(1).GetChild(1).GetChild(5).GetChild(2).GetComponent<Text>().text = str_usestaticfun(allData.allzuiba);
+        transform.GetChild(1).GetChild(1).GetChild(6).GetChild(2).GetComponent<Text>().text = str_usestaticfun(allData.alllianxing);
+        transform.GetChild(1).GetChild(1).GetChild(7).GetChild(2).GetComponent<Text>().text = str_usestaticfun(allData.allyifu);
+
+
+        transform.GetChild(1).GetChild(1).GetChild(8).GetChild(0).GetComponent<Image>().sprite = backhairSprite[indexFun(allData.allfashi)];
+        transform.GetChild(1).GetChild(1).GetChild(8).GetChild(1).GetComponent<Image>().sprite = suitSprite[indexFun(allData.allyifu)];
+        transform.GetChild(1).GetChild(1).GetChild(8).GetChild(2).GetComponent<Image>().sprite = faceshapeSprite[indexFun(allData.alllianxing)];
+        transform.GetChild(1).GetChild(1).GetChild(8).GetChild(3).GetComponent<Image>().sprite = fronthairSprite[indexFun(allData.allyifu)];
+        transform.GetChild(1).GetChild(1).GetChild(8).GetChild(4).GetComponent<Image>().sprite = eyeSprite[indexFun(allData.allyanjing)];
+        transform.GetChild(1).GetChild(1).GetChild(8).GetChild(5).GetComponent<Image>().sprite = eyebrowSprite[indexFun(allData.allmeimao)];
+        transform.GetChild(1).GetChild(1).GetChild(8).GetChild(6).GetComponent<Image>().sprite = noiseSprite[indexFun(allData.allbizhi)];
+        transform.GetChild(1).GetChild(1).GetChild(8).GetChild(7).GetComponent<Image>().sprite = mouseSprite[indexFun(allData.allzuiba)];
+
 
         #endregion
 
         #region 出身      
 
-        chushentext[0].text = str_usestaticfun(allData.allchushen);
+        int chushen1 = Random.Range(0, 6);
+        chushentext[0].transform.parent.GetComponent<Image>().sprite = chushenSprite[chushen1];
+        int chushen1random = Random.Range(0, jsonreturn(chushen1).Count - 1);
+        chushentext[0].text = jsonreturn(chushen1)[chushen1random].tedian;
+        chushentext[0].transform.parent.GetChild(1).GetChild(0).GetComponent<Text>().text = jsonreturn(chushen1)[chushen1random].miaoshu;
 
-        chushentext[1].text = str_usestaticfun(allData.allaihao);
 
-        chushentext[2].text = str_usestaticfun(allData.alltedian);
+        int chushen2 = Random.Range(0, 6);
+        for (int i = 0; i < 6; i++)
+        {
+            if (chushen2 == chushen1)
+            {
+                chushen2 = Random.Range(0, 6);
+            }
+        }
+        chushentext[1].transform.parent.GetComponent<Image>().sprite = chushenSprite[chushen2];
+        int chushen2random = Random.Range(0, jsonreturn(chushen2).Count - 1);
+        chushentext[1].text = jsonreturn(chushen2)[chushen2random].tedian;
+        chushentext[1].transform.parent.GetChild(1).GetChild(0).GetComponent<Text>().text = jsonreturn(chushen2)[chushen2random].miaoshu;
+
+        int chushen3 = Random.Range(0, 6);
+        for (int i = 0; i < 6; i++)
+        {
+            if (chushen3 == chushen1 || chushen3 == chushen2)
+            {
+                chushen3 = Random.Range(0, 6);
+            }
+        }
+        chushentext[2].transform.parent.GetComponent<Image>().sprite = chushenSprite[chushen3];
+        int chushen3random = Random.Range(0, jsonreturn(chushen2).Count - 1);
+        chushentext[2].text = jsonreturn(chushen3)[chushen3random].tedian;
+        chushentext[2].transform.parent.GetChild(1).GetChild(0).GetComponent<Text>().text = jsonreturn(chushen3)[chushen3random].miaoshu;
         #endregion
 
         #region 人物属性
@@ -439,6 +685,11 @@ public class MainUIControl : MonoBehaviour
         resoult.transform.GetChild(0).GetComponent<Text>().text = (int.Parse(orignal.transform.GetChild(0).GetComponent<Text>().text) * rate).ToString();
     }
 
+
+    string str_usestaticfun(string str)
+    {
+        return allData.returnFun(str)[Random.Range(0, allData.returnFun(str).Length - 1)];
+    }
     void dynamic()
     {
         float movespeed = 0.3f;
@@ -492,14 +743,14 @@ public class MainUIControl : MonoBehaviour
             jibencontent[0] = "女";
         }
 
-        jibencontent[1] = transform.GetChild(0).GetChild(0).GetChild(0).GetChild(1).GetComponent<InputField>().text;
-        jibencontent[2] = transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetComponent<Text>().text;
-        jibencontent[3] = transform.GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetComponent<Text>().text;
-        jibencontent[4] = transform.GetChild(0).GetChild(0).GetChild(3).GetChild(0).GetComponent<Text>().text;
+        jibencontent[1] = transform.GetChild(1).GetChild(0).GetChild(0).GetChild(1).GetComponent<InputField>().text;
+        jibencontent[2] = transform.GetChild(1).GetChild(0).GetChild(1).GetChild(0).GetComponent<Text>().text;
+        jibencontent[3] = transform.GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetComponent<Text>().text;
+        jibencontent[4] = transform.GetChild(1).GetChild(0).GetChild(3).GetChild(0).GetComponent<Text>().text;
 
-        jibencontent[5] = transform.GetChild(0).GetChild(4).GetChild(0).GetComponent<Text>().text;
-        jibencontent[6] = transform.GetChild(0).GetChild(5).GetChild(0).GetComponent<Text>().text;
-        jibencontent[7] = transform.GetChild(0).GetChild(6).GetChild(0).GetComponent<Text>().text;
+        jibencontent[5] = transform.GetChild(1).GetChild(4).GetChild(0).GetComponent<Text>().text;
+        jibencontent[6] = transform.GetChild(1).GetChild(5).GetChild(0).GetComponent<Text>().text;
+        jibencontent[7] = transform.GetChild(1).GetChild(6).GetChild(0).GetComponent<Text>().text;
 
 
         File.WriteAllLines(jibenpath, jibencontent);
@@ -512,7 +763,7 @@ public class MainUIControl : MonoBehaviour
 
         for (int i = 0; i < clothescontent.Length - 1; i++)
         {
-            clothescontent[i] = transform.GetChild(0).GetChild(1).GetChild(i).GetChild(2).GetComponent<Text>().text;
+            clothescontent[i] = transform.GetChild(1).GetChild(1).GetChild(i).GetChild(2).GetComponent<Text>().text;
         }
 
         if (int.Parse(zhuangtaishuxing[3].transform.GetChild(0).GetComponent<Text>().text) < 0)
@@ -549,19 +800,28 @@ public class MainUIControl : MonoBehaviour
         string[] content = new string[length];
         for (int i = 0; i < length; i++)
         {
-            content[i] = transform.GetChild(1).GetChild(childindex).GetChild(1).GetChild(i).GetChild(0).GetComponent<Text>().text;
+            content[i] = transform.GetChild(0).GetChild(childindex).GetChild(1).GetChild(i).GetChild(0).GetComponent<Text>().text;
         }
         File.WriteAllLines(anotherpath, content);
     }
 
-    string str_usestaticfun(string intstr)
+    int indexFun(string intstr)
     {
-        string str = allData.returnFun(intstr)[Random.Range(0, allData.returnFun(intstr).Length - 1)];
-        return str;
+        return Random.Range(0, allData.returnFun(intstr).Length - 1);
     }
+
     string[] strs_usestaticfun(string intstr)
     {
         string[] strs = allData.returnFun(intstr);
         return strs;
+    }
+
+    void readSprite(Sprite[] sp, string path, int length)
+    {
+        for (int i = 0; i < length; i++)
+        {
+            sp[i] = Resources.Load<Sprite>(string.Format("malePicture/{0}/{1}", path, i));
+        }
+
     }
 }
